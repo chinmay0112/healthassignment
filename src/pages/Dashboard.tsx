@@ -25,29 +25,6 @@ import {
 import { usePatientStore } from "../store/usePatientStore";
 
 // Mock Data
-const upcomingAppointments = [
-  {
-    id: 1,
-    patient: "Sarah Jenkins",
-    time: "09:00 AM",
-    type: "General Checkup",
-    status: "Waiting",
-  },
-  {
-    id: 2,
-    patient: "Michael Chen",
-    time: "10:30 AM",
-    type: "Cardiology Consult",
-    status: "Confirmed",
-  },
-  {
-    id: 3,
-    patient: "Emily Rodriguez",
-    time: "11:15 AM",
-    type: "Post-op Review",
-    status: "In Progress",
-  },
-];
 
 const recentActivities = [
   {

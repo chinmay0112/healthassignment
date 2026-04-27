@@ -37,7 +37,7 @@ const Login = () => {
     setServerError("");
     setSuccess(false);
     try {
-      const userCredential = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth,
         data.email,
         data.password,

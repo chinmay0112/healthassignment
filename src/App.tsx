@@ -16,7 +16,7 @@ import Dashboard from "./pages/Dashboard";
 import PatientDetails from "./pages/PatientDetails";
 import Patients from "./pages/Patients";
 const App = () => {
-  const { setUser, loading, user } = useAuthStore();
+  const { setUser, user } = useAuthStore();
   useEffect(() => {
     // This listener runs once when the app loads
     const unsubscribe = onAuthStateChanged(auth, (user) => {

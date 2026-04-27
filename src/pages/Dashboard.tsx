@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { auth } from "../api/firebase";
+import { signOut } from "firebase/auth";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -18,7 +20,9 @@ import {
   FileText,
   CheckCircle2,
   Syringe,
+  LogOut,
 } from "lucide-react";
+import { usePatientStore } from "../store/usePatientStore";
 
 // Mock Data
 const upcomingAppointments = [
@@ -76,6 +80,16 @@ const recentActivities = [
 ];
 
 const Dashboard = () => {
+  const { patients } = usePatientStore();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      toast.error("Failed to sign out");
+    }
+  };
+
   const simulateNotification = async () => {
     try {
       // 1. Check and request permission
@@ -134,7 +148,10 @@ const Dashboard = () => {
         </div>
         <div className="mt-4 md:mt-0 flex flex-wrap gap-3">
           <Link to="/analytics">
-            <Button variant="outline" className="gap-2 font-medium text-indigo-600 border-indigo-200 hover:bg-indigo-50">
+            <Button
+              variant="outline"
+              className="gap-2 font-medium text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+            >
               <Activity className="h-4 w-4" /> View Analytics
             </Button>
           </Link>
@@ -146,6 +163,15 @@ const Dashboard = () => {
             className="gap-2 bg-rose-500 hover:bg-rose-600 shadow-md shadow-rose-500/20 transition-all font-medium"
           >
             <Bell className="h-4 w-4" /> Simulate Patient Alert
+          </Button>
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            className="text-slate-500 hover:text-rose-600 hover:bg-rose-50 px-3"
+            title="Log out"
+          >
+            Logout
+            <LogOut className="h-5 w-5" />
           </Button>
         </div>
       </div>
@@ -163,20 +189,23 @@ const Dashboard = () => {
                   Your schedule for the next few hours
                 </CardDescription>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-blue-600 font-medium"
-              >
-                View All
-              </Button>
+              <Link to="/patients">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-blue-600 font-medium"
+                >
+                  View All
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-slate-100">
-                {upcomingAppointments.map((apt) => (
-                  <div
-                    key={apt.id}
-                    className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors group"
+                {patients.slice(0, 4).map((patient) => (
+                  <Link
+                    key={patient.id}
+                    to={`/patients/${patient.id}`}
+                    className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors group block"
                   >
                     <div className="flex items-center gap-4">
                       <div className="h-12 w-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -184,31 +213,31 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <h4 className="text-base font-bold text-slate-900">
-                          {apt.patient}
+                          {patient.name}
                         </h4>
                         <p className="text-sm text-slate-500 font-medium">
-                          {apt.type}
+                          {patient.diagnosis}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="flex items-center text-slate-700 font-bold justify-end gap-1.5 mb-1">
                         <Clock className="h-4 w-4 text-slate-400" />
-                        {apt.time}
+                        Today
                       </div>
                       <span
                         className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                          apt.status === "Waiting"
-                            ? "bg-amber-100 text-amber-700"
-                            : apt.status === "In Progress"
-                              ? "bg-blue-100 text-blue-700"
+                          patient.status === "Critical"
+                            ? "bg-rose-100 text-rose-700"
+                            : patient.status === "Recovering"
+                              ? "bg-indigo-100 text-indigo-700"
                               : "bg-emerald-100 text-emerald-700"
                         }`}
                       >
-                        {apt.status}
+                        {patient.status}
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </CardContent>
@@ -223,7 +252,9 @@ const Dashboard = () => {
                     <p className="text-blue-100 font-medium text-sm">
                       Active Patients
                     </p>
-                    <h3 className="text-4xl font-extrabold mt-1">42</h3>
+                    <h3 className="text-4xl font-extrabold mt-1">
+                      {patients.length}
+                    </h3>
                   </div>
                   <div className="h-14 w-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                     <User className="h-7 w-7 text-white" />
